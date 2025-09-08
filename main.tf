@@ -95,7 +95,7 @@ resource "aws_guardduty_detector_feature" "ecs_runtime_monitoring" {
 
   additional_configuration {
     name   = "ECS_FARGATE_AGENT_MANAGEMENT"
-    status = var.enable_ecs_runtime_monitoring && var.manage_eks_addon ? "ENABLED" : "DISABLED"
+    status = var.enable_ecs_runtime_monitoring && var.manage_ecs_agent ? "ENABLED" : "DISABLED"
   }
 }
 
@@ -112,7 +112,7 @@ resource "aws_guardduty_detector_feature" "ec2_runtime_monitoring" {
 
   additional_configuration {
     name   = "EC2_AGENT_MANAGEMENT"
-    status = var.enable_ec2_runtime_monitoring && var.manage_eks_addon ? "ENABLED" : "DISABLED"
+    status = var.enable_ec2_runtime_monitoring && var.manage_ec2_agent ? "ENABLED" : "DISABLED"
   }
 }
 

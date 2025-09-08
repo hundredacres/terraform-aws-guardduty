@@ -60,6 +60,18 @@ variable "manage_eks_addon" {
   default     = false
 }
 
+variable "manage_ecs_agent" {
+  description = "Enable the management of Amazon GuardDuty Agent for ECS through GuardDuty. Defaults to `false`."
+  type        = bool
+  default     = false
+}
+
+variable "manage_ec2_agent" {
+  description = "Enable the management of Amazon GuardDuty Agent for EC2 through GuardDuty. Defaults to `false`."
+  type        = bool
+  default     = false
+}
+
 variable "admin_account_id" {
   description = "AWS Organizations Admin Account Id. Defaults to `null`"
   type        = string

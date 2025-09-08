@@ -83,7 +83,7 @@ resource "aws_guardduty_organization_configuration_feature" "ecs_runtime_monitor
 
   additional_configuration {
     name        = "ECS_FARGATE_AGENT_MANAGEMENT"
-    auto_enable = var.enable_ecs_runtime_monitoring && var.manage_eks_addon ? var.auto_enable_organization_members : "NONE"
+    auto_enable = var.enable_ecs_runtime_monitoring && var.manage_ecs_agent ? var.auto_enable_organization_members : "NONE"
   }
 }
 
@@ -100,7 +100,7 @@ resource "aws_guardduty_organization_configuration_feature" "ec2_runtime_monitor
 
   additional_configuration {
     name        = "EC2_AGENT_MANAGEMENT"
-    auto_enable = var.enable_ec2_runtime_monitoring && var.manage_eks_addon ? var.auto_enable_organization_members : "NONE"
+    auto_enable = var.enable_ec2_runtime_monitoring && var.manage_ec2_agent ? var.auto_enable_organization_members : "NONE"
   }
 }
 

@@ -37,9 +37,30 @@ resource "aws_guardduty_detector_feature" "s3_protection" {
 }
 
 ##################################################
+# Amazon RDS Protection
+##################################################
+resource "aws_guardduty_detector_feature" "rds_protection" {
+  count = var.enable_guardduty && var.enable_rds_protection ? 1 : 0
+
+  detector_id = aws_guardduty_detector.primary.id
+  name        = "RDS_LOGIN_EVENTS"
+  status      = "ENABLED"
+}
+
+##################################################
+# Amazon Lambda Protection
+##################################################
+resource "aws_guardduty_detector_feature" "lambda_protection" {
+  count = var.enable_guardduty && var.enable_lambda_protection ? 1 : 0
+
+  detector_id = aws_guardduty_detector.primary.id
+  name        = "LAMBDA_NETWORK_LOGS"
+  status      = "ENABLED"
+}
+
+##################################################
 # Amazon EKS Protection and Runtime Monitoring
 ##################################################
-
 resource "aws_guardduty_detector_feature" "kubernetes_protection" {
   count = var.enable_guardduty && var.enable_kubernetes_protection ? 1 : 0
 
@@ -52,7 +73,7 @@ resource "aws_guardduty_detector_feature" "eks_runtime_monitoring" {
   count = var.enable_guardduty && var.enable_eks_runtime_monitoring ? 1 : 0
 
   detector_id = aws_guardduty_detector.primary.id
-  name        = "EKS_RUNTIME_MONITORING"
+  name        = "RUNTIME_MONITORING"
   status      = "ENABLED"
 
   additional_configuration {
@@ -62,11 +83,56 @@ resource "aws_guardduty_detector_feature" "eks_runtime_monitoring" {
 }
 
 ##################################################
+# Amazon ECS Runtime Monitoring
+##################################################
+
+resource "aws_guardduty_detector_feature" "ecs_runtime_monitoring" {
+  count = var.enable_guardduty && var.enable_ecs_runtime_monitoring ? 1 : 0
+
+  detector_id = aws_guardduty_detector.primary.id
+  name        = "RUNTIME_MONITORING"
+  status      = "ENABLED"
+
+  additional_configuration {
+    name   = "ECS_FARGATE_AGENT_MANAGEMENT"
+    status = var.enable_ecs_runtime_monitoring && var.manage_eks_addon ? "ENABLED" : "DISABLED"
+  }
+}
+
+##################################################
+# Amazon EC2 Monitoring
+##################################################
+
+resource "aws_guardduty_detector_feature" "ec2_runtime_monitoring" {
+  count = var.enable_guardduty && var.enable_ec2_runtime_monitoring ? 1 : 0
+
+  detector_id = aws_guardduty_detector.primary.id
+  name        = "RUNTIME_MONITORING"
+  status      = "ENABLED"
+
+  additional_configuration {
+    name   = "EC2_AGENT_MANAGEMENT"
+    status = var.enable_ec2_runtime_monitoring && var.manage_eks_addon ? "ENABLED" : "DISABLED"
+  }
+}
+
+##################################################
+# Amazon EBS Malware Protection
+##################################################
+resource "aws_guardduty_detector_feature" "ebs_protection" {
+  count = var.enable_guardduty && var.enable_malware_protection ? 1 : 0
+
+  detector_id = aws_guardduty_detector.primary.id
+  name        = "EBS_MALWARE_PROTECTION"
+  status      = "ENABLED"
+}
+
+##################################################
 # Amazon GuardDuty Malware Protection plan
 ##################################################
 resource "aws_guardduty_malware_protection_plan" "this" {
   for_each = var.enable_guardduty && var.enable_malware_protection ? toset(var.malware_resource_protection) : []
-  role     = aws_iam_service_linked_role.malware_protection
+  role     = var.create_malware_protection_role ? aws_iam_service_linked_role.malware_protection : data.aws_iam_role.malware_protection
 
   protected_resource {
     s3_bucket {
@@ -87,6 +153,7 @@ resource "aws_guardduty_malware_protection_plan" "this" {
 }
 
 resource "aws_iam_service_linked_role" "malware_protection" {
+  count            = var.enable_guardduty && var.enable_malware_protection && var.create_malware_protection_role ? 1 : 0
   aws_service_name = "malware-protection.guardduty.amazonaws.com"
 }
 
@@ -288,7 +355,7 @@ module "s3_bucket" {
   version = "~> 5.7.0"
 
   bucket = var.guardduty_s3_bucket == null ? "guardduty-${data.aws_caller_identity.current.account_id}-${random_string.this[0].result}-bucket" : var.guardduty_s3_bucket
-  acl    = var.guardduty_bucket_acl
+  acl    = var.guardduty_bucket_acl # default to null, bucket doesn't accept ACLs
 
   attach_policy                         = true
   policy                                = data.aws_iam_policy_document.guardduty_bucket_policy[0].json
@@ -386,7 +453,7 @@ module "replica_bucket" {
   version = "~> 5.7.0"
 
   bucket = var.guardduty_s3_bucket == null ? "guardduty-${data.aws_caller_identity.current.account_id}-${random_string.this[0].result}-replica-bucket" : var.guardduty_s3_bucket
-  acl    = null #bucket doesn't accept ACLs
+  acl    = null # default to null, bucket doesn't accept ACLs
 
   attach_policy                         = true
   policy                                = data.aws_iam_policy_document.guardduty_replica_bucket_policy[0].json

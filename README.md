@@ -145,8 +145,13 @@ module "guardduty_detector" {
 | Name | Type |
 |------|------|
 | [aws_guardduty_detector.primary](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/guardduty_detector) | resource |
+| [aws_guardduty_detector_feature.ebs_protection](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/guardduty_detector_feature) | resource |
+| [aws_guardduty_detector_feature.ec2_runtime_monitoring](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/guardduty_detector_feature) | resource |
+| [aws_guardduty_detector_feature.ecs_runtime_monitoring](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/guardduty_detector_feature) | resource |
 | [aws_guardduty_detector_feature.eks_runtime_monitoring](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/guardduty_detector_feature) | resource |
 | [aws_guardduty_detector_feature.kubernetes_protection](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/guardduty_detector_feature) | resource |
+| [aws_guardduty_detector_feature.lambda_protection](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/guardduty_detector_feature) | resource |
+| [aws_guardduty_detector_feature.rds_protection](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/guardduty_detector_feature) | resource |
 | [aws_guardduty_detector_feature.s3_protection](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/guardduty_detector_feature) | resource |
 | [aws_guardduty_filter.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/guardduty_filter) | resource |
 | [aws_guardduty_ipset.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/guardduty_ipset) | resource |
@@ -168,16 +173,22 @@ module "guardduty_detector" {
 | [aws_iam_policy_document.guardduty_bucket_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.guardduty_kms_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.guardduty_replica_bucket_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_role.malware_protection](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_role) | data source |
 | [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
 
 ### Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_create_malware_protection_role"></a> [create\_malware\_protection\_role](#input\_create\_malware\_protection\_role) | Create a Service-linked Role for GuardDuty Malware Protection. Defaults to `false`. | `bool` | `false` | no |
+| <a name="input_enable_ec2_runtime_monitoring"></a> [enable\_ec2\_runtime\_monitoring](#input\_enable\_ec2\_runtime\_monitoring) | Enable Amazon EC2 Agent Management and Runtime monitoring. Defaults to `true`. | `bool` | `true` | no |
+| <a name="input_enable_ecs_runtime_monitoring"></a> [enable\_ecs\_runtime\_monitoring](#input\_enable\_ecs\_runtime\_monitoring) | Enable Amazon ECS Fargate Runtime monitoring for all clusters. Defaults to `true`. | `bool` | `true` | no |
 | <a name="input_enable_eks_runtime_monitoring"></a> [enable\_eks\_runtime\_monitoring](#input\_enable\_eks\_runtime\_monitoring) | Enable Amazon EKS Runtime monitoring for all clusters. Defaults to `true`. | `bool` | `true` | no |
 | <a name="input_enable_guardduty"></a> [enable\_guardduty](#input\_enable\_guardduty) | Enable monitoring and feedback reporting. Setting to false is equivalent to 'suspending' GuardDuty. Defaults to `true`. | `bool` | `true` | no |
 | <a name="input_enable_kubernetes_protection"></a> [enable\_kubernetes\_protection](#input\_enable\_kubernetes\_protection) | Configure and enable Kubernetes audit logs as a data source for Kubernetes protection. Defaults to `true`. | `bool` | `true` | no |
+| <a name="input_enable_lambda_protection"></a> [enable\_lambda\_protection](#input\_enable\_lambda\_protection) | Configure and enable Lambda protection. Defaults to `true`. | `bool` | `true` | no |
 | <a name="input_enable_malware_protection"></a> [enable\_malware\_protection](#input\_enable\_malware\_protection) | Configure and enable Malware Protection as data source for EC2 instances with findings for the detector. Defaults to `true`. | `bool` | `true` | no |
+| <a name="input_enable_rds_protection"></a> [enable\_rds\_protection](#input\_enable\_rds\_protection) | Configure and enable RDS protection. Defaults to `true`. | `bool` | `true` | no |
 | <a name="input_enable_s3_protection"></a> [enable\_s3\_protection](#input\_enable\_s3\_protection) | Configure and enable S3 protection. Defaults to `true`. | `bool` | `true` | no |
 | <a name="input_enable_snapshot_retention"></a> [enable\_snapshot\_retention](#input\_enable\_snapshot\_retention) | Enable EBS Snaptshot retention for 30 days, if any Findings exists. Defaults to `false`. | `bool` | `false` | no |
 | <a name="input_filter_config"></a> [filter\_config](#input\_filter\_config) | Specifies AWS GuardDuty Filter configuration.<br>  `name` - The name of the filter<br>  `rank` - Specifies the position of the filter in the list of current filters. Also specifies the order in which this filter is applied to the findings.<br>  `action` - Specifies the action that is to be applied to the findings that match the filter. Can be one of ARCHIVE or NOOP.<br>  `criterion` - Configuration block for `finding_criteria`. Composed by `field` and one or more of the following operators: `equals` \| `not_equals` \| `greater_than` \| `greater_than_or_equal` \| `less_than` \| `less_than_or_equal`. | <pre>list(object({<br>    name        = string<br>    description = optional(string)<br>    rank        = number<br>    action      = string<br>    criterion = list(object({<br>      field                 = string<br>      equals                = optional(list(string))<br>      not_equals            = optional(list(string))<br>      greater_than          = optional(string)<br>      greater_than_or_equal = optional(string)<br>      less_than             = optional(string)<br>      less_than_or_equal    = optional(string)<br>    }))<br>  }))</pre> | `null` | no |

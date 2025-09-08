@@ -1,6 +1,5 @@
 module "standalone_guardduty" {
-  source  = "aws-ia/guardduty/aws"
-  version = "0.0.2"
+  source = "../../.."
 
   replica_region               = "us-east-1"
   enable_guardduty             = true
@@ -52,7 +51,6 @@ module "standalone_guardduty" {
     object_acl = "public-read"
 
   }]
-  publish_to_s3        = true
-  guardduty_bucket_acl = "private"
-  tags                 = {}
+  publish_to_s3 = true
+  tags          = {}
 }

@@ -136,22 +136,27 @@ module "guardduty_detector" {
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_log_bucket"></a> [log\_bucket](#module\_log\_bucket) | terraform-aws-modules/s3-bucket/aws | 3.14.0 |
-| <a name="module_replica_bucket"></a> [replica\_bucket](#module\_replica\_bucket) | terraform-aws-modules/s3-bucket/aws | 3.14.0 |
-| <a name="module_s3_bucket"></a> [s3\_bucket](#module\_s3\_bucket) | terraform-aws-modules/s3-bucket/aws | 3.14.0 |
+| <a name="module_log_bucket"></a> [log\_bucket](#module\_log\_bucket) | terraform-aws-modules/s3-bucket/aws | ~> 5.7.0 |
+| <a name="module_replica_bucket"></a> [replica\_bucket](#module\_replica\_bucket) | terraform-aws-modules/s3-bucket/aws | ~> 5.7.0 |
+| <a name="module_s3_bucket"></a> [s3\_bucket](#module\_s3\_bucket) | terraform-aws-modules/s3-bucket/aws | ~> 5.7.0 |
 
 ### Resources
 
 | Name | Type |
 |------|------|
 | [aws_guardduty_detector.primary](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/guardduty_detector) | resource |
+| [aws_guardduty_detector_feature.eks_runtime_monitoring](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/guardduty_detector_feature) | resource |
+| [aws_guardduty_detector_feature.kubernetes_protection](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/guardduty_detector_feature) | resource |
+| [aws_guardduty_detector_feature.s3_protection](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/guardduty_detector_feature) | resource |
 | [aws_guardduty_filter.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/guardduty_filter) | resource |
 | [aws_guardduty_ipset.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/guardduty_ipset) | resource |
+| [aws_guardduty_malware_protection_plan.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/guardduty_malware_protection_plan) | resource |
 | [aws_guardduty_publishing_destination.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/guardduty_publishing_destination) | resource |
 | [aws_guardduty_threatintelset.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/guardduty_threatintelset) | resource |
 | [aws_iam_policy.bucket_replication](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_role.bucket_replication](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role_policy_attachment.replication](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_service_linked_role.malware_protection](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_service_linked_role) | resource |
 | [aws_kms_key.guardduty_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
 | [aws_kms_key.replica_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
 | [aws_s3_object.ipset_object](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_object) | resource |
@@ -169,6 +174,7 @@ module "guardduty_detector" {
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_enable_eks_runtime_monitoring"></a> [enable\_eks\_runtime\_monitoring](#input\_enable\_eks\_runtime\_monitoring) | Enable Amazon EKS Runtime monitoring for all clusters. Defaults to `true`. | `bool` | `true` | no |
 | <a name="input_enable_guardduty"></a> [enable\_guardduty](#input\_enable\_guardduty) | Enable monitoring and feedback reporting. Setting to false is equivalent to 'suspending' GuardDuty. Defaults to `true`. | `bool` | `true` | no |
 | <a name="input_enable_kubernetes_protection"></a> [enable\_kubernetes\_protection](#input\_enable\_kubernetes\_protection) | Configure and enable Kubernetes audit logs as a data source for Kubernetes protection. Defaults to `true`. | `bool` | `true` | no |
 | <a name="input_enable_malware_protection"></a> [enable\_malware\_protection](#input\_enable\_malware\_protection) | Configure and enable Malware Protection as data source for EC2 instances with findings for the detector. Defaults to `true`. | `bool` | `true` | no |
@@ -179,6 +185,8 @@ module "guardduty_detector" {
 | <a name="input_guardduty_bucket_acl"></a> [guardduty\_bucket\_acl](#input\_guardduty\_bucket\_acl) | Canned ACL to apply to the bucket. Valid values are `private` \| `public-read` \| `public-read-write` \| `aws-exec-read` \| `authenticated-read` \| `bucket-owner-read` \| `bucket-owner-full-control`. Defaults to `null`. | `string` | `null` | no |
 | <a name="input_guardduty_s3_bucket"></a> [guardduty\_s3\_bucket](#input\_guardduty\_s3\_bucket) | Name of the S3 Bucket for GuardDuty. Defaults to `null`. | `string` | `null` | no |
 | <a name="input_ipset_config"></a> [ipset\_config](#input\_ipset\_config) | Specifies AWS GuardDuty IPSet configuration.<br>  `activate` - Specifies whether GuardDuty is to start using the uploaded IPSet.<br>  `name` - The friendly name to identify the IPSet.<br>  `format` - The format of the file that contains the IPSet. Valid values: `TXT` \| `STIX` \| `OTX_CSV` \| `ALIEN_VAULT` \| `PROOF_POINT` \| `FIRE_EYE`.<br>  `content`- Literal string value to use as the object content, which will be uploaded as UTF-8-encoded text. Example: `10.0.0.0/8\n`.<br>  `key` - Name of the object once it is in the bucket. | <pre>list(object({<br>    activate = bool<br>    name     = string<br>    format   = string<br>    content  = string<br>    key      = string<br>  }))</pre> | `null` | no |
+| <a name="input_malware_resource_protection"></a> [malware\_resource\_protection](#input\_malware\_resource\_protection) | List of resources to be scanned by GuardDuty Malware Protection plan. | `list(string)` | `[]` | no |
+| <a name="input_manage_eks_addon"></a> [manage\_eks\_addon](#input\_manage\_eks\_addon) | Enable the management of Amazon GuardDuty Agent EKS Addon through GuardDuty. Defaults to `false`. | `bool` | `false` | no |
 | <a name="input_publish_to_s3"></a> [publish\_to\_s3](#input\_publish\_to\_s3) | Specifies if the Amazon GuardDuty findings should be exported to S3. Defaults to `false`. | `bool` | `false` | no |
 | <a name="input_publishing_config"></a> [publishing\_config](#input\_publishing\_config) | Defines the findings publishing configuration. | <pre>list(object({<br>    destination_arn  = string<br>    kms_key_arn      = string<br>    destination_type = optional(string)<br>  }))</pre> | <pre>[<br>  {<br>    "destination_arn": null,<br>    "destination_type": "S3",<br>    "kms_key_arn": null<br>  }<br>]</pre> | no |
 | <a name="input_replica_region"></a> [replica\_region](#input\_replica\_region) | Region where S3 bucket data from Amazon GuardDuty will be replicated. Defaults to `null`. | `string` | `null` | no |

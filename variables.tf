@@ -19,16 +19,28 @@ variable "enable_s3_protection" {
   default     = true
 }
 
+variable "enable_malware_protection" {
+  description = "Configure and enable Malware Protection as data source for EC2 instances with findings for the detector. Defaults to `true`."
+  type        = bool
+  default     = true
+}
+
 variable "enable_kubernetes_protection" {
   description = "Configure and enable Kubernetes audit logs as a data source for Kubernetes protection. Defaults to `true`."
   type        = bool
   default     = true
 }
 
-variable "enable_malware_protection" {
-  description = "Configure and enable Malware Protection as data source for EC2 instances with findings for the detector. Defaults to `true`."
+variable "enable_eks_runtime_monitoring" {
+  description = "Enable Amazon EKS Runtime monitoring for all clusters. Defaults to `true`."
   type        = bool
   default     = true
+}
+
+variable "manage_eks_addon" {
+  description = "Enable the management of Amazon GuardDuty Agent EKS Addon through GuardDuty. Defaults to `false`."
+  type        = bool
+  default     = false
 }
 
 variable "enable_snapshot_retention" {
@@ -42,7 +54,6 @@ variable "finding_publishing_frequency" {
   type        = string
   default     = "FIFTEEN_MINUTES"
 }
-
 
 ##################################################
 # GuardDuty Filter
@@ -158,4 +169,10 @@ variable "tags" {
   description = "Key-value map of resource tags. If configured with a provider default_tags configuration block present, tags with matching keys will overwrite those defined at the provider-level. Defaults to `{}`."
   type        = map(any)
   default     = {}
+}
+
+variable "malware_resource_protection" {
+  description = "List of resources to be scanned by GuardDuty Malware Protection plan."
+  type        = list(string)
+  default     = []
 }

@@ -84,7 +84,7 @@ data "aws_iam_policy_document" "guardduty_kms_policy" {
     ]
 
     resources = [
-      "arn:aws:kms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:key/*"
+      "arn:aws:kms:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:key/*"
     ]
 
     principals {
@@ -100,7 +100,7 @@ data "aws_iam_policy_document" "guardduty_kms_policy" {
     ]
 
     resources = [
-      "arn:aws:kms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:key/*"
+      "arn:aws:kms:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:key/*"
     ]
 
     principals {

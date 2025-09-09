@@ -8,8 +8,7 @@ provider "aws" {
 data "aws_caller_identity" "current" {}
 
 module "delegated_admin" {
-  source  = "aws-ia/guardduty/aws//modules/organizations_admin"
-  version = "0.0.2"
+  source = "../../../modules/organizations_admin/"
 
   admin_account_id                 = data.aws_caller_identity.current.account_id
   auto_enable_organization_members = "NEW"
@@ -21,8 +20,7 @@ module "delegated_admin" {
 }
 
 module "member" {
-  source  = "aws-ia/guardduty/aws//modules/organizations_member"
-  version = "0.0.2"
+  source = "../../../modules/organizations_member/"
 
   providers = {
     aws        = aws
@@ -40,8 +38,7 @@ module "member" {
 }
 
 module "guardduty_detector" {
-  source  = "aws-ia/guardduty/aws"
-  version = "0.0.2"
+  source = "../../.."
 
   replica_region               = "us-east-1"
   enable_guardduty             = true

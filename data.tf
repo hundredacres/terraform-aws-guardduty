@@ -2,6 +2,11 @@ data "aws_caller_identity" "current" {}
 
 data "aws_region" "current" {}
 
+data "aws_iam_role" "malware_protection" {
+  count = var.create_malware_protection_role ? 1 : 0
+  name  = "AWSServiceRoleForAmazonGuardDutyMalwareProtection"
+}
+
 data "aws_iam_policy_document" "guardduty_bucket_policy" {
   count = var.ipset_config != null || var.threatintelset_config != null || var.publish_to_s3 ? 1 : 0
 
@@ -84,7 +89,7 @@ data "aws_iam_policy_document" "guardduty_kms_policy" {
     ]
 
     resources = [
-      "arn:aws:kms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:key/*"
+      "arn:aws:kms:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:key/*"
     ]
 
     principals {
@@ -100,7 +105,7 @@ data "aws_iam_policy_document" "guardduty_kms_policy" {
     ]
 
     resources = [
-      "arn:aws:kms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:key/*"
+      "arn:aws:kms:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:key/*"
     ]
 
     principals {

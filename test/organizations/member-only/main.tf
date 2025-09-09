@@ -8,8 +8,7 @@ provider "aws" {
 data "aws_guardduty_detector" "primary" {}
 
 module "member" {
-  source  = "aws-ia/guardduty/aws//modules/organizations_member"
-  version = "0.0.2"
+  source = "../../../modules/organizations_member/"
 
   providers = {
     aws        = aws

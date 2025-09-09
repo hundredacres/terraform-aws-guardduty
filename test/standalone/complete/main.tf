@@ -1,14 +1,18 @@
 module "standalone_guardduty" {
-  source  = "aws-ia/guardduty/aws"
-  version = "0.0.2"
+  source = "../../.."
 
-  replica_region               = "us-east-1"
-  enable_guardduty             = true
-  enable_s3_protection         = true
-  enable_kubernetes_protection = true
-  enable_malware_protection    = true
-  enable_snapshot_retention    = true
-  finding_publishing_frequency = "FIFTEEN_MINUTES"
+  replica_region                = "us-east-1"
+  enable_guardduty              = true
+  enable_s3_protection          = true
+  enable_rds_protection         = true
+  enable_lambda_protection      = true
+  enable_kubernetes_protection  = true
+  enable_eks_runtime_monitoring = true
+  enable_ecs_runtime_monitoring = true
+  enable_ec2_runtime_monitoring = true
+  enable_malware_protection     = true
+  enable_snapshot_retention     = true
+  finding_publishing_frequency  = "FIFTEEN_MINUTES"
   filter_config = [{
     name        = "guardduty_filter"
     description = "AWS GuardDuty example filter."
@@ -52,7 +56,6 @@ module "standalone_guardduty" {
     object_acl = "public-read"
 
   }]
-  publish_to_s3        = true
-  guardduty_bucket_acl = "private"
-  tags                 = {}
+  publish_to_s3 = true
+  tags          = {}
 }

@@ -17,7 +17,7 @@ resource "aws_guardduty_organization_configuration" "this" {
 # Amazon S3 Protection
 ##################################################
 resource "aws_guardduty_organization_configuration_feature" "s3_protection" {
-  count = aws_guardduty_organization_configuration.this[0].detector_id != null && var.enable_s3_protection ? 1 : 0
+  count = aws_guardduty_organization_configuration.this != null && var.enable_s3_protection ? 1 : 0
 
   detector_id = aws_guardduty_organization_configuration.this[0].detector_id
   name        = "S3_DATA_EVENTS"
@@ -28,7 +28,7 @@ resource "aws_guardduty_organization_configuration_feature" "s3_protection" {
 # Amazon RDS Protection
 ##################################################
 resource "aws_guardduty_organization_configuration_feature" "rds_protection" {
-  count = aws_guardduty_organization_configuration.this[0].detector_id != null && var.enable_rds_protection ? 1 : 0
+  count = aws_guardduty_organization_configuration.this != null && var.enable_rds_protection ? 1 : 0
 
   detector_id = aws_guardduty_organization_configuration.this[0].detector_id
   name        = "RDS_LOGIN_EVENTS"
@@ -39,7 +39,7 @@ resource "aws_guardduty_organization_configuration_feature" "rds_protection" {
 # Amazon Lambda Protection
 ##################################################
 resource "aws_guardduty_organization_configuration_feature" "lambda_protection" {
-  count = aws_guardduty_organization_configuration.this[0].detector_id != null && var.enable_lambda_protection ? 1 : 0
+  count = aws_guardduty_organization_configuration.this != null && var.enable_lambda_protection ? 1 : 0
 
   detector_id = aws_guardduty_organization_configuration.this[0].detector_id
   name        = "LAMBDA_NETWORK_LOGS"
@@ -50,7 +50,7 @@ resource "aws_guardduty_organization_configuration_feature" "lambda_protection" 
 # Amazon EKS Protection and Runtime Monitoring
 ##################################################
 resource "aws_guardduty_organization_configuration_feature" "kubernetes_protection" {
-  count = aws_guardduty_organization_configuration.this[0].detector_id != null && var.enable_kubernetes_protection ? 1 : 0
+  count = aws_guardduty_organization_configuration.this != null && var.enable_kubernetes_protection ? 1 : 0
 
   detector_id = aws_guardduty_organization_configuration.this[0].detector_id
   name        = "EKS_AUDIT_LOGS"
@@ -58,7 +58,7 @@ resource "aws_guardduty_organization_configuration_feature" "kubernetes_protecti
 }
 
 resource "aws_guardduty_organization_configuration_feature" "eks_runtime_monitoring" {
-  count = aws_guardduty_organization_configuration.this[0].detector_id != null && var.enable_eks_runtime_monitoring ? 1 : 0
+  count = aws_guardduty_organization_configuration.this != null && var.enable_eks_runtime_monitoring ? 1 : 0
 
   detector_id = aws_guardduty_organization_configuration.this[0].detector_id
   name        = "RUNTIME_MONITORING"
@@ -75,7 +75,7 @@ resource "aws_guardduty_organization_configuration_feature" "eks_runtime_monitor
 ##################################################
 
 resource "aws_guardduty_organization_configuration_feature" "ecs_runtime_monitoring" {
-  count = aws_guardduty_organization_configuration.this[0].detector_id != null && var.enable_ecs_runtime_monitoring ? 1 : 0
+  count = aws_guardduty_organization_configuration.this != null && var.enable_ecs_runtime_monitoring ? 1 : 0
 
   detector_id = aws_guardduty_organization_configuration.this[0].detector_id
   name        = "RUNTIME_MONITORING"
@@ -92,7 +92,7 @@ resource "aws_guardduty_organization_configuration_feature" "ecs_runtime_monitor
 ##################################################
 
 resource "aws_guardduty_organization_configuration_feature" "ec2_runtime_monitoring" {
-  count = aws_guardduty_organization_configuration.this[0].detector_id != null && var.enable_ec2_runtime_monitoring ? 1 : 0
+  count = aws_guardduty_organization_configuration.this != null && var.enable_ec2_runtime_monitoring ? 1 : 0
 
   detector_id = aws_guardduty_organization_configuration.this[0].detector_id
   name        = "RUNTIME_MONITORING"
@@ -108,7 +108,7 @@ resource "aws_guardduty_organization_configuration_feature" "ec2_runtime_monitor
 # Amazon EBS Malware Protection
 ##################################################
 resource "aws_guardduty_organization_configuration_feature" "ebs_protection" {
-  count = aws_guardduty_organization_configuration.this[0].detector_id != null && var.enable_malware_protection ? 1 : 0
+  count = aws_guardduty_organization_configuration.this != null && var.enable_malware_protection ? 1 : 0
 
   detector_id = aws_guardduty_organization_configuration.this[0].detector_id
   name        = "EBS_MALWARE_PROTECTION"

@@ -58,15 +58,34 @@ resource "aws_guardduty_organization_configuration_feature" "kubernetes_protecti
 }
 
 resource "aws_guardduty_organization_configuration_feature" "eks_runtime_monitoring" {
-  count = aws_guardduty_organization_configuration.this != null && var.enable_eks_runtime_monitoring ? 1 : 0
+  count = aws_guardduty_organization_configuration.this != null && (var.enable_eks_runtime_monitoring ? 1 : 0 || var.enable_ecs_runtime_monitoring ? 1 : 0 || var.enable_ec2_runtime_monitoring ? 1 : 0)
 
   detector_id = aws_guardduty_organization_configuration.this[0].detector_id
   name        = "RUNTIME_MONITORING"
   auto_enable = var.auto_enable_organization_members
 
-  additional_configuration {
-    name        = "EKS_ADDON_MANAGEMENT"
-    auto_enable = var.enable_eks_runtime_monitoring && var.manage_eks_addon ? var.auto_enable_organization_members : "NONE"
+  dynamic "additional_configuration" {
+    for_each = var.enable_ecs_runtime_monitoring ? [1] : []
+    content {
+      name   = "ECS_FARGATE_AGENT_MANAGEMENT"
+      auto_enable = var.enable_ecs_runtime_monitoring && var.manage_ecs_agent ? var.auto_enable_organization_members : "NONE"
+    }
+  }
+
+  dynamic "additional_configuration" {
+    for_each = var.enable_eks_runtime_monitoring ? [1] : []
+    content {
+      name   = "EKS_ADDON_MANAGEMENT"
+      auto_enable = var.enable_eks_runtime_monitoring && var.manage_eks_addon ? var.auto_enable_organization_members : "NONE"
+    }
+  }
+
+  dynamic "additional_configuration" {
+    for_each = var.enable_ecs_runtime_monitoring ? [1] : []
+    content {
+      name   = "EC2_AGENT_MANAGEMENT"
+      auto_enable = var.enable_ec2_runtime_monitoring && var.manage_ec2_agent ? var.auto_enable_organization_members : "NONE"
+    }
   }
 }
 
@@ -74,35 +93,35 @@ resource "aws_guardduty_organization_configuration_feature" "eks_runtime_monitor
 # Amazon ECS Runtime Monitoring
 ##################################################
 
-resource "aws_guardduty_organization_configuration_feature" "ecs_runtime_monitoring" {
-  count = aws_guardduty_organization_configuration.this != null && var.enable_ecs_runtime_monitoring ? 1 : 0
+# resource "aws_guardduty_organization_configuration_feature" "ecs_runtime_monitoring" {
+#   count = aws_guardduty_organization_configuration.this != null && var.enable_ecs_runtime_monitoring ? 1 : 0
 
-  detector_id = aws_guardduty_organization_configuration.this[0].detector_id
-  name        = "RUNTIME_MONITORING"
-  auto_enable = var.auto_enable_organization_members
+#   detector_id = aws_guardduty_organization_configuration.this[0].detector_id
+#   name        = "RUNTIME_MONITORING"
+#   auto_enable = var.auto_enable_organization_members
 
-  additional_configuration {
-    name        = "ECS_FARGATE_AGENT_MANAGEMENT"
-    auto_enable = var.enable_ecs_runtime_monitoring && var.manage_ecs_agent ? var.auto_enable_organization_members : "NONE"
-  }
-}
+#   additional_configuration {
+#     name        = "ECS_FARGATE_AGENT_MANAGEMENT"
+#     auto_enable = var.enable_ecs_runtime_monitoring && var.manage_ecs_agent ? var.auto_enable_organization_members : "NONE"
+#   }
+# }
 
 ##################################################
 # Amazon EC2 Monitoring
 ##################################################
 
-resource "aws_guardduty_organization_configuration_feature" "ec2_runtime_monitoring" {
-  count = aws_guardduty_organization_configuration.this != null && var.enable_ec2_runtime_monitoring ? 1 : 0
+# resource "aws_guardduty_organization_configuration_feature" "ec2_runtime_monitoring" {
+#   count = aws_guardduty_organization_configuration.this != null && var.enable_ec2_runtime_monitoring ? 1 : 0
 
-  detector_id = aws_guardduty_organization_configuration.this[0].detector_id
-  name        = "RUNTIME_MONITORING"
-  auto_enable = var.auto_enable_organization_members
+#   detector_id = aws_guardduty_organization_configuration.this[0].detector_id
+#   name        = "RUNTIME_MONITORING"
+#   auto_enable = var.auto_enable_organization_members
 
-  additional_configuration {
-    name        = "EC2_AGENT_MANAGEMENT"
-    auto_enable = var.enable_ec2_runtime_monitoring && var.manage_ec2_agent ? var.auto_enable_organization_members : "NONE"
-  }
-}
+#   additional_configuration {
+#     name        = "EC2_AGENT_MANAGEMENT"
+#     auto_enable = var.enable_ec2_runtime_monitoring && var.manage_ec2_agent ? var.auto_enable_organization_members : "NONE"
+#   }
+# }
 
 ##################################################
 # Amazon EBS Malware Protection

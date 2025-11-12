@@ -70,15 +70,34 @@ resource "aws_guardduty_detector_feature" "kubernetes_protection" {
 }
 
 resource "aws_guardduty_detector_feature" "eks_runtime_monitoring" {
-  count = var.enable_guardduty && var.enable_eks_runtime_monitoring ? 1 : 0
+  count = var.enable_guardduty && (var.enable_eks_runtime_monitoring ? 1 : 0 || var.enable_ecs_runtime_monitoring ? 1 : 0 || var.enable_ec2_runtime_monitoring ? 1 : 0)
 
   detector_id = aws_guardduty_detector.primary.id
   name        = "RUNTIME_MONITORING"
   status      = "ENABLED"
 
-  additional_configuration {
-    name   = "EKS_ADDON_MANAGEMENT"
-    status = var.enable_eks_runtime_monitoring && var.manage_eks_addon ? "ENABLED" : "DISABLED"
+  dynamic "additional_configuration" {
+    for_each = var.enable_eks_runtime_monitoring ? [1] : []
+    content {
+      name   = "EKS_ADDON_MANAGEMENT"
+      status = var.manage_eks_addon ? "ENABLED" : "DISABLED"
+    }
+  }
+
+  dynamic "additional_configuration" {
+    for_each = var.enable_ecs_runtime_monitoring ? [1] : []
+    content {
+      name   = "ECS_FARGATE_AGENT_MANAGEMENT"
+      status = var.enable_ecs_runtime_monitoring && var.manage_ecs_agent ? "ENABLED" : "DISABLED"
+    }
+  }
+
+  dynamic "additional_configuration" {
+    for_each = var.enable_ecs_runtime_monitoring ? [1] : []
+    content {
+      name   = "EC2_AGENT_MANAGEMENT"
+      status = var.enable_ec2_runtime_monitoring && var.manage_ec2_agent ? "ENABLED" : "DISABLED"
+    }
   }
 }
 
@@ -86,35 +105,35 @@ resource "aws_guardduty_detector_feature" "eks_runtime_monitoring" {
 # Amazon ECS Runtime Monitoring
 ##################################################
 
-resource "aws_guardduty_detector_feature" "ecs_runtime_monitoring" {
-  count = var.enable_guardduty && var.enable_ecs_runtime_monitoring ? 1 : 0
+# resource "aws_guardduty_detector_feature" "ecs_runtime_monitoring" {
+#   count = var.enable_guardduty && var.enable_ecs_runtime_monitoring ? 1 : 0
 
-  detector_id = aws_guardduty_detector.primary.id
-  name        = "RUNTIME_MONITORING"
-  status      = "ENABLED"
+#   detector_id = aws_guardduty_detector.primary.id
+#   name        = "RUNTIME_MONITORING"
+#   status      = "ENABLED"
 
-  additional_configuration {
-    name   = "ECS_FARGATE_AGENT_MANAGEMENT"
-    status = var.enable_ecs_runtime_monitoring && var.manage_ecs_agent ? "ENABLED" : "DISABLED"
-  }
-}
+#   additional_configuration {
+#     name   = "ECS_FARGATE_AGENT_MANAGEMENT"
+#     status = var.enable_ecs_runtime_monitoring && var.manage_ecs_agent ? "ENABLED" : "DISABLED"
+#   }
+# }
 
 ##################################################
 # Amazon EC2 Monitoring
 ##################################################
 
-resource "aws_guardduty_detector_feature" "ec2_runtime_monitoring" {
-  count = var.enable_guardduty && var.enable_ec2_runtime_monitoring ? 1 : 0
+# resource "aws_guardduty_detector_feature" "ec2_runtime_monitoring" {
+#   count = var.enable_guardduty && var.enable_ec2_runtime_monitoring ? 1 : 0
 
-  detector_id = aws_guardduty_detector.primary.id
-  name        = "RUNTIME_MONITORING"
-  status      = "ENABLED"
+#   detector_id = aws_guardduty_detector.primary.id
+#   name        = "RUNTIME_MONITORING"
+#   status      = "ENABLED"
 
-  additional_configuration {
-    name   = "EC2_AGENT_MANAGEMENT"
-    status = var.enable_ec2_runtime_monitoring && var.manage_ec2_agent ? "ENABLED" : "DISABLED"
-  }
-}
+#   additional_configuration {
+#     name   = "EC2_AGENT_MANAGEMENT"
+#     status = var.enable_ec2_runtime_monitoring && var.manage_ec2_agent ? "ENABLED" : "DISABLED"
+#   }
+# }
 
 ##################################################
 # Amazon EBS Malware Protection

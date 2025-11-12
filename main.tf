@@ -70,7 +70,7 @@ resource "aws_guardduty_detector_feature" "kubernetes_protection" {
 }
 
 resource "aws_guardduty_detector_feature" "eks_runtime_monitoring" {
-  count = var.enable_guardduty && (var.enable_eks_runtime_monitoring ? 1 : 0 || var.enable_ecs_runtime_monitoring ? 1 : 0 || var.enable_ec2_runtime_monitoring ? 1 : 0)
+  count = var.enable_guardduty && (var.enable_eks_runtime_monitoring || var.enable_ecs_runtime_monitoring || var.enable_ec2_runtime_monitoring) ? 1 : 0
 
   detector_id = aws_guardduty_detector.primary.id
   name        = "RUNTIME_MONITORING"

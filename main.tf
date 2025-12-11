@@ -93,7 +93,7 @@ resource "aws_guardduty_detector_feature" "eks_runtime_monitoring" {
   }
 
   dynamic "additional_configuration" {
-    for_each = var.enable_ecs_runtime_monitoring ? [1] : []
+    for_each = var.enable_ec2_runtime_monitoring ? [1] : []
     content {
       name   = "EC2_AGENT_MANAGEMENT"
       status = var.enable_ec2_runtime_monitoring && var.manage_ec2_agent ? "ENABLED" : "DISABLED"

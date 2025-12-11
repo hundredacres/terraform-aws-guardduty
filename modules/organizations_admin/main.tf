@@ -57,34 +57,38 @@ resource "aws_guardduty_organization_configuration_feature" "kubernetes_protecti
   auto_enable = var.auto_enable_organization_members
 }
 
-resource "aws_guardduty_organization_configuration_feature" "eks_runtime_monitoring" {
-  count = aws_guardduty_organization_configuration.this != null && (var.enable_eks_runtime_monitoring ? 1 : 0 || var.enable_ecs_runtime_monitoring ? 1 : 0 || var.enable_ec2_runtime_monitoring ? 1 : 0)
+resource "aws_guardduty_organization_configuration_feature" "runtime_monitoring" {
+  count = aws_guardduty_organization_configuration.this != null && (
+    var.enable_eks_runtime_monitoring ||
+    var.enable_ecs_runtime_monitoring ||
+    var.enable_ec2_runtime_monitoring
+  ) ? 1 : 0
 
   detector_id = aws_guardduty_organization_configuration.this[0].detector_id
   name        = "RUNTIME_MONITORING"
   auto_enable = var.auto_enable_organization_members
 
   dynamic "additional_configuration" {
-    for_each = var.enable_ecs_runtime_monitoring ? [1] : []
-    content {
-      name   = "ECS_FARGATE_AGENT_MANAGEMENT"
-      auto_enable = var.enable_ecs_runtime_monitoring && var.manage_ecs_agent ? var.auto_enable_organization_members : "NONE"
-    }
-  }
-
-  dynamic "additional_configuration" {
     for_each = var.enable_eks_runtime_monitoring ? [1] : []
     content {
-      name   = "EKS_ADDON_MANAGEMENT"
-      auto_enable = var.enable_eks_runtime_monitoring && var.manage_eks_addon ? var.auto_enable_organization_members : "NONE"
+      name        = "EKS_ADDON_MANAGEMENT"
+      auto_enable = var.manage_eks_addon ? var.auto_enable_organization_members : "NONE"
     }
   }
 
   dynamic "additional_configuration" {
     for_each = var.enable_ecs_runtime_monitoring ? [1] : []
     content {
-      name   = "EC2_AGENT_MANAGEMENT"
-      auto_enable = var.enable_ec2_runtime_monitoring && var.manage_ec2_agent ? var.auto_enable_organization_members : "NONE"
+      name        = "ECS_FARGATE_AGENT_MANAGEMENT"
+      auto_enable = var.manage_ecs_agent ? var.auto_enable_organization_members : "NONE"
+    }
+  }
+
+  dynamic "additional_configuration" {
+    for_each = var.enable_ec2_runtime_monitoring ? [1] : []
+    content {
+      name        = "EC2_AGENT_MANAGEMENT"
+      auto_enable = var.manage_ec2_agent ? var.auto_enable_organization_members : "NONE"
     }
   }
 }
